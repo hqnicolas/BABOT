@@ -753,14 +753,6 @@ String buildStatePayload(const TelemetryState &telemetry,
   payload += ',';
   appendJsonNumber(payload, "pidAutotuneSigma", telemetry.pidAutotuneSigma);
   payload += ',';
-  appendJsonBool(payload, "captureActive", telemetry.captureActive);
-  payload += ',';
-  appendJsonNumber(payload, "captureTimeMs", telemetry.captureTimeMs);
-  payload += ',';
-  appendJsonNumber(payload, "captureVelocity", telemetry.captureVelocity);
-  payload += ',';
-  appendJsonNumber(payload, "captureRadiusTrend", telemetry.captureRadiusTrend);
-  payload += ',';
   appendJsonNumber(payload, "pidAutotuneNoiseFloor", 0.0f);
   payload += ',';
   appendJsonString(payload, "pidAutotuneLastFailure", String(telemetry.pidAutotuneLastFailure));

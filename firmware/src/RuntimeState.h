@@ -139,10 +139,6 @@ struct TelemetryState {
   float pidAutotuneNextD;
   float pidAutotuneSigma;
   uint8_t pidAutotuneGeneration;
-  bool captureActive;
-  float captureTimeMs;
-  float captureVelocity;
-  float captureRadiusTrend;
   char pidAutotuneLastFailure[kStatusTextCapacity];
   float sensorSignals[kSensorCount];
 };

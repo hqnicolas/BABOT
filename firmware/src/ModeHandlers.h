@@ -126,7 +126,6 @@ void handleOnMode() {
   }
 
   blinkStatusColor(300, makeColor(255, 96, 0));
-  gCaptureState.active = false;
 
   if (gBallWasOnPlate && millis() - gBallLostTime < babot::kBallHoldTimeoutMs) {
     movePlatformWithMotionGrace(gPlateRoll, gPlatePitch, babot::kPlateHeightMm);

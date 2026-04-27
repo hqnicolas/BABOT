@@ -56,7 +56,7 @@ void PlatformControl::movePlatform(float rollDeg, float pitchDeg, float height) 
   }
 
   const float roll = rollDeg * kDegToRad;
-  const float pitch = pitchDeg * kDegToRad;
+  const float pitch = -pitchDeg * kDegToRad;  // Negate pitch to match physical Y-axis orientation.
   const float baseAngle[3] = {0.0f, 120.0f * kDegToRad, 240.0f * kDegToRad};
   const float platformPhaseOffset = kPlatformPhaseOffsetDeg * kDegToRad;
   float platformX[3];

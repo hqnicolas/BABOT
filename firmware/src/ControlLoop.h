@@ -71,11 +71,10 @@ void publishSharedState() {
   gTelemetry.pidAutotuneSigma = gCmaEs.sigma;
   gTelemetry.pidAutotuneGeneration = gCmaEs.generation;
 
-  gTelemetry.captureActive = gCaptureState.active;
-  gTelemetry.captureTimeMs = static_cast<float>(gCaptureState.cycles) *
-                             static_cast<float>(babot::kControlIntervalUs) / 1000.0f;
-  gTelemetry.captureVelocity = gCaptureState.speed;
-  gTelemetry.captureRadiusTrend = gCaptureState.radiusTrend;
+  gTelemetry.captureActive = false;
+  gTelemetry.captureTimeMs = 0.0f;
+  gTelemetry.captureVelocity = 0.0f;
+  gTelemetry.captureRadiusTrend = 0.0f;
 
   strncpy(gTelemetry.pidAutotuneLastFailure,
           gPidAutotuneLastFailure,
@@ -102,59 +101,6 @@ void resetClosedLoopState() {
   gSkipCounter = 0;
   gBallMissingCycles = 0;
   gBallDetectionGraceActive = false;
-  gCaptureState = {false, false, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-}
-
-void updateCaptureKinematics(float targetX, float targetY) {
-  const float dx = targetX - gCenterX;
-  const float dy = targetY - gCenterY;
-  const float radius = sqrtf(dx * dx + dy * dy);
-  float velocityX = 0.0f;
-  float velocityY = 0.0f;
-  float radiusTrend = 0.0f;
-
-  if (gCaptureState.hasPrevious) {
-    velocityX = gCenterX - gCaptureState.previousX;
-    velocityY = gCenterY - gCaptureState.previousY;
-    radiusTrend = radius - gCaptureState.previousRadius;
-  }
-
-  gCaptureState.velocityX = velocityX;
-  gCaptureState.velocityY = velocityY;
-  gCaptureState.speed = sqrtf(velocityX * velocityX + velocityY * velocityY);
-  gCaptureState.radius = radius;
-  gCaptureState.radiusTrend = radiusTrend;
-  gCaptureState.previousX = gCenterX;
-  gCaptureState.previousY = gCenterY;
-  gCaptureState.previousRadius = radius;
-  gCaptureState.hasPrevious = true;
-}
-
-bool captureShouldStart(bool newlyDetected) {
-  return newlyDetected ||
-         gCaptureState.radius >= gCaptureTuning.radiusThreshold ||
-         gCaptureState.speed >= gCaptureTuning.speedThreshold ||
-         gCaptureState.radiusTrend >= kCaptureTriggerOutwardRate;
-}
-
-bool captureShouldRelease() {
-  if (gCaptureState.cycles < kCaptureMinCycles) {
-    return false;
-  }
-  if (gCaptureState.cycles >= gCaptureTuning.maxCycles) {
-    return true;
-  }
-  if (gCaptureState.radius <= kCaptureReleaseRadius && gCaptureState.speed <= kCaptureReleaseSpeed) {
-    return true;
-  }
-  return gCaptureState.radiusTrend <= kCaptureReleaseInwardRate;
-}
-
-void resetPidDerivativeForCurrentTarget(float targetX, float targetY) {
-  gLastErrorX = targetX - gCenterX;
-  gLastErrorY = targetY - gCenterY;
-  gIntegralX = 0.0f;
-  gIntegralY = 0.0f;
 }
 
 void applyCaptureOrPidControl(float targetX,
@@ -164,35 +110,11 @@ void applyCaptureOrPidControl(float targetX,
                               float gainD,
                               float tiltLimitDeg,
                               bool newlyDetected) {
-  updateCaptureKinematics(targetX, targetY);
-
-  if (!gCaptureState.active && captureShouldStart(newlyDetected)) {
-    gCaptureState.active = true;
-    gCaptureState.cycles = 0;
+  if (newlyDetected) {
+    gLastErrorX = targetX - gCenterX;
+    gLastErrorY = targetY - gCenterY;
     gIntegralX = 0.0f;
     gIntegralY = 0.0f;
-  }
-
-  if (gCaptureState.active) {
-    const float dx = targetX - gCenterX;
-    const float dy = targetY - gCenterY;
-    gPlateRoll = gCaptureTuning.positionGain * dx - gCaptureTuning.velocityGain * gCaptureState.velocityX;
-    gPlatePitch = gCaptureTuning.positionGain * dy - gCaptureTuning.velocityGain * gCaptureState.velocityY;
-    gRawPlateRoll = gPlateRoll;
-    gRawPlatePitch = gPlatePitch;
-    gPlateRoll = constrain(gPlateRoll, -tiltLimitDeg, tiltLimitDeg);
-    gPlatePitch = constrain(gPlatePitch, -tiltLimitDeg, tiltLimitDeg);
-    gSmoothRoll = babot::kOutputSmoothingAlpha * gPlateRoll +
-                  (1.0f - babot::kOutputSmoothingAlpha) * gSmoothRoll;
-    gSmoothPitch = babot::kOutputSmoothingAlpha * gPlatePitch +
-                   (1.0f - babot::kOutputSmoothingAlpha) * gSmoothPitch;
-    movePlatformWithMotionGrace(gSmoothRoll, gSmoothPitch, babot::kPlateHeightMm);
-    ++gCaptureState.cycles;
-    if (captureShouldRelease()) {
-      gCaptureState.active = false;
-      resetPidDerivativeForCurrentTarget(targetX, targetY);
-    }
-    return;
   }
 
   gErrorX = targetX - gCenterX;

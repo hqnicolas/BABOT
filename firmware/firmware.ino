@@ -87,27 +87,6 @@ struct PidAutotuneHistory {
   PidAutotuneMetrics metrics;
 };
 
-struct CaptureControllerState {
-  bool active;
-  bool hasPrevious;
-  uint16_t cycles;
-  float previousX;
-  float previousY;
-  float previousRadius;
-  float velocityX;
-  float velocityY;
-  float speed;
-  float radius;
-  float radiusTrend;
-};
-
-struct CaptureTuning {
-  uint16_t maxCycles;
-  float radiusThreshold;
-  float speedThreshold;
-  float positionGain;
-  float velocityGain;
-};
 
 enum PidAutotuneRelayAxis : uint8_t {
   RELAY_AXIS_NONE,
@@ -241,7 +220,6 @@ constexpr float kCaptureTriggerOutwardRate = 0.03f;
 
 PidAutotunePhase gPidAutotunePhase = AUTOTUNE_IDLE;
 PidAutotuneStage gPidAutotuneStage = AUTOTUNE_STAGE_BASELINE;
-CaptureControllerState gCaptureState = {false, false, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 PidAutotuneCandidate gPidAutotuneQueue[kPidAutotuneMaxEvaluations] = {};
 PidAutotuneHistory gPidAutotuneHistory[kPidAutotuneMaxEvaluations] = {};
 PidAutotuneCandidate gPidAutotunePreviousGains = {0.0f, 0.0f, 0.0f};
@@ -252,21 +230,6 @@ PidAutotuneMetrics gPidAutotuneBestMetrics = {999999.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 PidAutotuneMetrics gPidAutotuneBaselineMetrics = {999999.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, false};
 PidAutotuneMetrics gPidAutotunePdReferenceMetrics = {999999.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, false};
 PidAutotuneCandidate gPidAutotunePdBestGains = {0.0f, 0.0f, 0.0f};
-CaptureTuning gCaptureTuning = {kDefaultCaptureMaxCycles,
-                                kDefaultCaptureTriggerRadius,
-                                kDefaultCaptureTriggerSpeed,
-                                kDefaultCapturePositionGain,
-                                kDefaultCaptureVelocityGain};
-CaptureTuning gPidAutotunePreviousCaptureTuning = {kDefaultCaptureMaxCycles,
-                                                   kDefaultCaptureTriggerRadius,
-                                                   kDefaultCaptureTriggerSpeed,
-                                                   kDefaultCapturePositionGain,
-                                                   kDefaultCaptureVelocityGain};
-CaptureTuning gPidAutotuneCandidateCaptureTuning = {kDefaultCaptureMaxCycles,
-                                                     kDefaultCaptureTriggerRadius,
-                                                     kDefaultCaptureTriggerSpeed,
-                                                     kDefaultCapturePositionGain,
-                                                     kDefaultCaptureVelocityGain};
 float gPidAutotuneNoiseFloor = 0.0f;
 float gPidAutotuneNoiseSum = 0.0f;
 uint8_t gPidAutotuneSafetyAborts = 0;
