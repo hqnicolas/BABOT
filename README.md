@@ -4,6 +4,8 @@ An autonomous high-precision ball-balancing instrument predicated on a 3-DOF Ste
 
 This project represents a modern realization of parallel robotics, bridging classical control theory with contemporary high-frequency embedded systems.
 
+https://github.com/user-attachments/assets/6e9986bd-6b06-4d86-9c46-4f5fcbdaf4ec
+
 **License:** [Creative Commons Attribution-NonCommercial 4.0 International](LICENSE)
 
 ---
