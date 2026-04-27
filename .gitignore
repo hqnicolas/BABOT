@@ -40,3 +40,9 @@ build/
 
 # VSCode settings (if you're using it)
 .vscode/
+
+# Repo-local dependency refresh scratch space
+.vendor-staging/
+
+# Failed or ad-hoc Arduino CLI workspace experiments
+.arduino-workspace/
