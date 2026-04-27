@@ -71,11 +71,6 @@ void publishSharedState() {
   gTelemetry.pidAutotuneSigma = gCmaEs.sigma;
   gTelemetry.pidAutotuneGeneration = gCmaEs.generation;
 
-  gTelemetry.captureActive = false;
-  gTelemetry.captureTimeMs = 0.0f;
-  gTelemetry.captureVelocity = 0.0f;
-  gTelemetry.captureRadiusTrend = 0.0f;
-
   strncpy(gTelemetry.pidAutotuneLastFailure,
           gPidAutotuneLastFailure,
           sizeof(gTelemetry.pidAutotuneLastFailure) - 1);
